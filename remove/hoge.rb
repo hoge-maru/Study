@@ -18,6 +18,10 @@ entries = Dir::entries($path)
 entries.delete_if { |x| /.*\.$/ =~ x }
 num = entries.length
 
+if num < $max
+	exit
+end
+
 entries.sort! do |a, b|
   File.stat($path + a).mtime.strftime("%Y%m%d%H%M%S") <=>
   File.stat($path + b).mtime.strftime("%Y%m%d%H%M%S")
