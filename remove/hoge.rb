@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require 'optparse'
 
 $path = "/home/y-ishimaru/git/Study/remove/hoge/"
