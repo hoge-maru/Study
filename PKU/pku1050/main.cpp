@@ -8,14 +8,13 @@
 #include <algorithm>
 
 using namespace std;
-#define FILE
+//#define FILE
 
-const int MAX = 150;
+const int MAX = 105;
 
 int map[MAX][MAX];
 int N = 0;
-int tothemax[MAX*MAX] = {0};
-int maxhash[MAX*MAX] = {0};
+int mapsum[MAX][MAX];
 
 int maxSubRec = INT_MIN;
 int mxnum = INT_MIN;
@@ -47,71 +46,39 @@ void resetPos(t_pos* pos)
 	pos->leftupy = INT_MIN;
 }
 
-int calcVal(int leftupx, int leftupy, int w, int h)
+int calcValEx(t_pos* pos)
 {
+
+	int val = mapsum[pos->leftupy + pos->h][pos->leftupx + pos->w];
 	
-	int yi = 0;
+	int xi = pos->leftupx + pos->w;
+	int yi = pos->leftupy - 1;
 
-	int sum = 0;
+	int delA = 0;
+	int delB = 0;
+	int addC = 0;
 
-	int k = (w+1)*(h+1);
-
-	for(int xi = leftupx; xi < leftupx+w+1; xi++){
-		for(int yi = leftupy; yi < leftupy+h+1; yi++){
-			
-			if(xi >= N || yi >= N){
-				break;
-			}
-
-
-			int val = map[yi][xi];
-			if(val == INT_MIN){
-				perror("illegal path");
-				exit(1);
-			}
-			sum += val;
-			k--;
-
-			//if(k*mxnum+sum < maxSubRec && k!=0){
-			if(maxhash[k]+sum < maxSubRec && k!=0){
-				break;
-			}
-
-		}
+	if( !(xi < 0 || yi <0 || xi > N || yi > N) ){
+		delA = mapsum[yi][xi];
 	}
 
-	return sum;
-}
+	xi = pos->leftupx - 1;
+	yi = pos->leftupy + pos->h;
 
-int calcVal(t_pos* prev, t_pos* now)
-{
-
-	int rtn = INT_MIN;
-
-	if(prev->h == INT_MIN){
-		rtn = calcVal(now->leftupx, now->leftupy, now->w, now->h);
-		g_prevVal = rtn;
-		return rtn;
+	if( !(xi < 0 || yi <0 || xi > N || yi > N) ){
+		delB = mapsum[yi][xi];
 	}
-	int diffh = now->h - prev->h;
-	int diffw = now->w - prev->w;
-
-
-	if(diffh == 1 && diffw == 0){
-		int updated_yi = prev->leftupy + prev->h+1; 
-		int nowval = calcVal(prev->leftupx, updated_yi, now->w, 0);
-		rtn = g_prevVal+nowval;
-	}else if(diffh == 0 && diffw == 1){
-		int updated_xi = prev->leftupx + prev->w+1; 
-		int nowval = calcVal(updated_xi, prev->leftupy,  0, now->h);
-		rtn = g_prevVal+nowval;
-	}else{
-		rtn = calcVal(now->leftupx, now->leftupy, now->w, now->h);
+	xi = pos->leftupx - 1;
+	yi = pos->leftupy - 1;
+	
+	if( !(xi < 0 || yi <0 || xi > N || yi > N) ){
+		addC = mapsum[yi][xi];
 	}
 
-	g_prevVal = rtn;
+	int ans = val + addC - delA - delB;
 
-	return rtn;
+
+	return ans;
 }
 
 int main()
@@ -144,54 +111,50 @@ int main()
 		if(val > mxnum){
 			mxnum = val;
 		}
-		tothemax[zi++] = val;
 
 	}
 
-	sort(tothemax, tothemax+zi, greater<int>());
-	for(int l = 0; l < N*N; l++){
-		int sum = 0;
-		for(int m = 0; m < l+1; m++){
-			sum += tothemax[m];
+	for(yi =0; yi < N; yi++){
+		int xsum = 0;
+		for(xi =0; xi < N; xi++){
+			xsum += map[yi][xi];
+			mapsum[yi][xi] = xsum;
 		}
-		maxhash[l] = sum;
+
 	}
 
-	t_pos maxpos;
+	for(xi =0; xi < N; xi++){
+		int ysum = 0;
+		for(yi =0; yi < N; yi++){
+			ysum += mapsum[yi][xi];
+			mapsum[yi][xi] = ysum;
+		}
 
-	t_pos prevpos;
+	}
+
 	t_pos nowpos;
-	resetPos(&prevpos);
 	resetPos(&nowpos);
 
-	for(xi = 0; xi < N; xi++){
-		for(yi = 0; yi < N; yi++){
+	int wmax = 0;
+	int hmax = 0;
 
-			for(int w =0; w < (N-xi); w++){
-				for(int h =0; h < (N-yi); h++){
-					//int tmp = calcVal(xi, yi, w, h);
-					nowpos.h = h;
-					nowpos.w = w;
-					nowpos.leftupx = xi;
-					nowpos.leftupy = yi;
+	for(nowpos.leftupx = 0; nowpos.leftupx < N; nowpos.leftupx++){
 
-					int tmp = calcVal(&prevpos, &nowpos);
+		wmax = N - nowpos.leftupx;
 
-					prevpos.h = h;
-					prevpos.w = w;
-					prevpos.leftupx = xi;
-					prevpos.leftupy = yi;
+		for(nowpos.leftupy = 0; nowpos.leftupy < N; nowpos.leftupy++){
+			
+			hmax = N-nowpos.leftupy;
 
-					if(tmp > maxSubRec ){
-						maxSubRec = tmp;
-						maxpos.leftupx = xi;
-						maxpos.leftupy = yi;
-						maxpos.w = w;
-						maxpos.h = h;
+			for(nowpos.w=0; nowpos.w < wmax; nowpos.w++){
 
-					}
+				for(nowpos.h =0; nowpos.h < hmax; nowpos.h++){
+
+					//cout<<"x:"<<nowpos.leftupx<<", y:"<<nowpos.leftupy<<", w:"<<nowpos.w<<", h:"<<nowpos.h<<endl;
+					//cout<<ans<<endl;
+					maxSubRec = std::max(calcValEx(&nowpos), maxSubRec);
+
 				}
-				resetPos(&prevpos);
 			}
 		}
 	}
