@@ -35,11 +35,6 @@ void end()
 #define REP(i, x) for(int i = 0; i < x; i++)
 #define REP1(i, x) for(int i = 1; i <= x; i++)
 
-enum{
-	SINPLE = 0,
-	COMPOUND
-};
-
 void cleartable()
 {
 	memset(candidate_table, 0, sizeof(candidate_table));
