@@ -6,3 +6,11 @@
 *.user
 Debug/
 *.ipch
+
+# java
+build/
+manifest.xml
+manifest.mf
+build.xml
+nbproject/
+
