@@ -27,6 +27,8 @@ public class Main {
     private static final int[][] seq = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     private static int counter = 0;
     
+    private static int cnt=0;
+    
     enum mapval{
         init(0),
         black(1),
@@ -54,14 +56,7 @@ public class Main {
     }
     
     private static boolean walk(int x, int y){
-       
-        if(map[y][x] == mapval.black.num){
-            map[y][x] = mapval.reached.num;
-            counter++;
-        }else{
-            
-        }
-        
+
         for(int i =0; i < 4; i++){
             int vx = seq[i][0];
             int vy = seq[i][1];
@@ -69,6 +64,8 @@ public class Main {
             int ny = y+vy;
             
             if(map[ny][nx] == mapval.black.num){
+                map[ny][nx] = mapval.reached.num;
+                counter++;
                 walk(nx, ny);
                 
             }else{
