@@ -1,10 +1,7 @@
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +14,7 @@ public class Main {
     public static class Polygon{
         ArrayList<Point2D> list;
         public int N;
+       
 
         public void setPoint(double x, double y){
             Point2D.Double p = new Point2D.Double(x, y);
@@ -40,14 +38,22 @@ public class Main {
         public boolean checkCorrespond(Polygon polygon){
             
             int find = 0;
-            for(Point2D p1 : list){
-                for(Point2D p2: polygon.list){
-                    if(p1.distance(p2) == 0){
-                        find ++;
+            for(int i=0; i < list.size()-1; i++){
+                Point2D a1 =  list.get(i);
+                Point2D a2 =  list.get(i+1);
+                
+                for(int j=0; j < list.size()-1; j++){
+                    Point2D b1 =  polygon.list.get(j);
+                    Point2D b2 =  polygon.list.get(j+1);
+                    if( (b1.equals(a1) && b2.equals(a2)) || (b1.equals(a2) && b2.equals(a1)) ){
+                        find++;
+                        break;
                     }
+                    
                 }
             }
-            if(find == N){
+
+            if(find == N-1){
                 return true;
             }
             return false;
@@ -81,16 +87,19 @@ public class Main {
         }
         int datanum = datanum = scan.nextInt();
         
-        while(datanum != 0){
+        while(datanum > 0){
 
             int pointnum = scan.nextInt();
+            if(pointnum < 0){
+                break;
+            }
             Polygon template = new Polygon(pointnum);
             for(int j = 0; j < pointnum; j++){
                 double x = scan.nextDouble();
                 double y = scan.nextDouble();
                 template.setPoint(x, y);
             }
-            if(template.list.get(0).distance(0, 0) != 0){
+            if(template.list.get(0).distance(0, 0) > 0.1){
                 double vx = template.list.get(0).getX();
                 double vy = template.list.get(0).getY();
                 template.movePoint(-vx, -vy);
@@ -106,16 +115,23 @@ public class Main {
                 }
                 
                 for(Point2D point:polygon.list){
-                    if(point.distance(0, 0) != 0){
+                    if(point.distance(0, 0) > 0.1){
                         polygon.movePoint(-point.getX(), -point.getY());
                     }
 
+                    
+                    boolean isCorrespond = false;
                     for(int k =0; k < 4; k++){                            
                         if(polygon.checkCorrespond(template)){
                             System.out.println(i+1);
+                            isCorrespond = true;
                             break;
                         }
                         polygon.rotate90();
+                    }
+                    if(isCorrespond){
+                        isCorrespond = false;
+                        break;
                     }
                     
 
