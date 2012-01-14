@@ -30,22 +30,27 @@ public class Main {
         }
         public void rotate90(){
             for(Point2D p : list){
-                double nx = -p.getY();
-                double ny = p.getX();
+                double nx = p.getY();
+                double ny = -p.getX();
                 p.setLocation(nx, ny);
             }
         }
         public boolean checkCorrespond(Polygon polygon){
             
             int find = 0;
+            
+            if(polygon.list.size() != list.size()){
+                return false;
+            }
+            
             for(int i=0; i < list.size()-1; i++){
                 Point2D a1 =  list.get(i);
                 Point2D a2 =  list.get(i+1);
                 
-                for(int j=0; j < list.size()-1; j++){
+                for(int j=0; j < polygon.list.size()-1; j++){
                     Point2D b1 =  polygon.list.get(j);
                     Point2D b2 =  polygon.list.get(j+1);
-                    if( (b1.equals(a1) && b2.equals(a2)) || (b1.equals(a2) && b2.equals(a1)) ){
+                    if( (b1.distance(a1) < 0.1 && b2.distance(a2) < 0.1) ||(b1.distance(a2) < 0.1 && b2.distance(a1) < 0.1) ){
                         find++;
                         break;
                     }
@@ -63,12 +68,6 @@ public class Main {
             N = n;
         }
     };
-    
-    private static void rotate90(Point2D p){
-        double nx = p.getY();
-        double ny = p.getX();
-        p.setLocation(nx, ny);
-    }
     
     
     public static void main(String args[]){
@@ -107,12 +106,14 @@ public class Main {
             
             for(int i = 0; i < datanum; i++){
                 int pnum = scan.nextInt();
-                Polygon polygon = new Polygon(pointnum);
-                for(int j = 0; j < pointnum; j++){
+                
+                Polygon polygon = new Polygon(pnum);
+                for(int j = 0; j < pnum; j++){
                     double x = scan.nextDouble();
                     double y = scan.nextDouble();
                     polygon.setPoint(x, y);
                 }
+                
                 
                 for(Point2D point:polygon.list){
                     if(point.distance(0, 0) > 0.1){
